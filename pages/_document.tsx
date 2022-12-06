@@ -1,20 +1,59 @@
-// pages/_document.js
+import Document, {  Html, Head, Main, NextScript , DocumentContext, DocumentInitialProps } from 'next/document'
+import { ServerStyleSheet } from 'styled-components'
 
-import { ColorModeScript } from "@chakra-ui/react";
-import NextDocument, { Html, Head, Main, NextScript } from "next/document";
-import theme from "../styles/theme";
+export default class MyDocument extends Document {
+  static async getInitialProps(
+    ctx: DocumentContext
+  ): Promise<DocumentInitialProps> {
+    const sheet = new ServerStyleSheet()
+    const originalRenderPage = ctx.renderPage
 
-export default class Document extends NextDocument {
-  render() {
-    return (
-      <Html lang="en">
+    try {
+      ctx.renderPage = () =>
+        originalRenderPage({
+          enhanceApp: (App) => (props) =>
+            sheet.collectStyles(<App {...props} />),
+        })
+
+      const initialProps = await Document.getInitialProps(ctx)
+      return {
+        ...initialProps,
+        styles: (
+          <>
+            {initialProps.styles}
+            {sheet.getStyleElement()}
+          </>
+        ),
+      }
+    } finally {
+      sheet.seal()
+    }
+  }
+
+    render() {
+        return (
+      <Html lang='pt-BR'>
         <Head />
         <body>
-          <ColorModeScript initialColorMode={theme.config.initialColorMode} />
           <Main />
           <NextScript />
         </body>
       </Html>
-    );
+    )
   }
 }
+
+
+
+// Menu creation
+// Version mobile
+// Version Desktop
+// Install styled-components in nexthjs with chakra UI
+// babel-plugin-styled-components configuration
+// @types/styled-components configuration
+// webpack svg in nexts.config.js configuration
+// organization of shared folder and components
+
+// global style setting
+// install baseUrl absolut Imports and Module path aliases
+
